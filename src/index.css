@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+.react-grid-placeholder {
+    background: transparent;
+    border: none;
+}
