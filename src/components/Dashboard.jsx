@@ -12,7 +12,7 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
-            <h1 className="mb-4 text-xl font-bold text-white">Student Organizer Dashboard</h1>
+            <h1 className="mb-4 text-xl font-bold text-black">Student Organizer Dashboard</h1>
 
             <GridLayout
                 className="layout"
@@ -22,10 +22,16 @@ export default function Dashboard() {
                 width={1200}
                 useCSSTransforms={true}
             >
-                <div key="calendar" className="rounded-xl  bg-gray-500 text-white border-r-8 border-b-8 border-gray-700 p-4 shadow">
-                    <Notes />
+                <div 
+                    key="notes" 
+                    className="rounded-xl  bg-gray-200 text-black border-r-8 border-b-8 border-gray-400 p-4"
+                    style={{height: "100%"}}
+                >
+                    <div className="h-full overflow-auto">
+                        <Notes />
+                    </div>
                 </div>
-                <div key="notes" className="rounded-xl border bg-white p-4 shadow">
+                <div key="calendar" className="rounded-xl bg-gray-200 text-black border-r-8 border-b-8 border-gray-400 p-4">
                     <h2 className="font-semibold">Notes Module</h2>
                     <p className="text-sm text-gray-500">Placeholder for notes</p>
                 </div>

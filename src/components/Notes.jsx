@@ -38,11 +38,11 @@ export default function Notes({ storageKey = "notes.v1", className = "", onChang
   }
 
   return (
-<div className="min-h-screen flex items-center justify-center  ">
+<div className="w-full h-full">
     <div
     className={`grid grid-cols-[280px_1fr] gap-4
-      w-[90%] max-w-6xl
-      rounded-[2rem] border 
+      w-full h-full
+      rounded-[1rem] border 
       shadow-[0_4px_30px_rgba(0,0,0,0.08)]
       dark:border-gray-700/60 dark:shadow-[0_4px_30px_rgba(0,0,0,0.3)]
       transition-all duration-300 hover:shadow-[0_8px_40px_rgba(0,0,0,0.1)] hover:scale-[1.01]
