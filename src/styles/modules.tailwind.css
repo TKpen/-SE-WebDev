@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+.react-grid-placeholder {
+    background: transparent !important;
+    border: none !important;
+}
+
+.drag-box {
+    @apply flex items-center justify-between
+    border-b bg-gray-300;
+}
+
+.module-box {
+    @apply rounded-xl bg-gray-200 text-black
+    border-r-8 border-b-8 border-gray-400 p-0 
+    overflow-hidden;
+}

@@ -1,6 +1,19 @@
 @import "tailwindcss";
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css" layer(utilities);
 
-.react-grid-placeholder {
-    background: transparent !important;
-    border: none !important;
+.blue-box {
+    @apply bg-sky-300 border-r-4 border-b-4 border-sky-500
+    rounded-xl w-58 h-12
+    active:border-b-2 active:border-r-2 transition-all duration-100;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
