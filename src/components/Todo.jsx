@@ -72,7 +72,7 @@ function ToDoList(){
         <ol className="w-full p-3 space-y-1 text-lg">
             {tasks.map((task, index) => 
                 <li key={index}>
-                    <span className="text-gray-500">{task}</span>
+                    <span className="text-gray-500 dark:text-white">{task}</span>
                         <div className='flex justify-end'>
                             <button
                                 className='p-1 cursor-pointer'

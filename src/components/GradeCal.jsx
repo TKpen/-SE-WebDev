@@ -66,12 +66,12 @@ export default function GradeCal() {
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto p-4 text-sm text-gray-800">
+    <div className="w-full h-full overflow-y-auto p-4 text-sm text-gray-800 dark:text-white">
 
 
 
       {/* Labels */}
-      <div className="grid grid-cols-[1fr_140px_140px] px-2 py-1 text-gray-600 font-semibold">
+      <div className="grid grid-cols-[1fr_140px_140px] px-2 py-1 text-gray-600 font-semibold dark:text-white">
         <p>ASSIGNMENT / EXAM</p>
         <p className="text-center">GRADE (%)</p>
         <p className="text-center">WEIGHT</p>
@@ -81,7 +81,8 @@ export default function GradeCal() {
       {rows.map((row) => (
         <div
           key={row.id}
-          className="grid grid-cols-[1fr_140px_140px] items-center gap-3 p-2 rounded-lg hover:bg-gray-50 border border-gray-200 mb-2"
+          className="grid grid-cols-[1fr_140px_140px] items-center gap-3 p-2 rounded-lg 
+          hover:bg-gray-50 border border-gray-200 mb-2 dark:bg-gray-700 dark:hover:bg-gray-800"
         >
           <input
             type="text"
@@ -130,7 +131,7 @@ export default function GradeCal() {
       <div className="px-2 mt-2">
         {error && <p className="text-red-600 text-xs">{error}</p>}
         {result !== null && !error && (
-          <p className="text-gray-800 text-sm">
+          <p className="text-gray-800 text-sm dark:text-white">
             Current grade:{" "}
             <span className="font-semibold">{result.toFixed(2)}%</span>
           </p>

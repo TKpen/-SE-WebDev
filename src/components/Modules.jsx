@@ -9,9 +9,9 @@ import LinkList from "./LinkList";
 import ToDoList from "./Todo";
 
 const layout = [
-    {i: "gradeCalc", x: 0, y: 0, w: 6, h: 6},
-    {i: "notes", x: 6, y: 0, w: 6, h: 6, minH: 4},
-    {i: "todo", x: 6, y: 6, w: 4, h: 8, minH: 3, minW: 3},
+    {i: "gradeCalc", x: 0, y: 0, w: 6, h: 6, minH: 4, minW: 4},
+    {i: "notes", x: 6, y: 0, w: 6, h: 6, minH: 4, minW: 4},
+    {i: "todo", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 4},
 ];
 
 export default function Modules() {
