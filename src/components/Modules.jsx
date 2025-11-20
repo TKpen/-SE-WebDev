@@ -9,7 +9,7 @@ import LinkList from "./LinkList";
 import ToDoList from "./Todo";
 
 const layout = [
-    {i: "calendar", x: 0, y: 0, w: 6, h: 6},
+    {i: "gradeCalc", x: 0, y: 0, w: 6, h: 6},
     {i: "notes", x: 6, y: 0, w: 6, h: 6, minH: 4},
     {i: "todo", x: 6, y: 6, w: 4, h: 8, minH: 3, minW: 3},
 ];
@@ -47,18 +47,8 @@ export default function Modules() {
                     </div>
                 </div>
                 
-            </GridLayout>
-
-            <GridLayout
-                className="layout"
-                layout={layout}
-                cols={12}
-                rowHeight={30}
-                width={1200}
-                draggableHandle=".module-drag-handle"
-            >
                 <div 
-                    key="notes" 
+                    key="gradeCalc" 
                     className="module-box flex flex-col h-full"
                     style={{height: "100%"}}
                 >

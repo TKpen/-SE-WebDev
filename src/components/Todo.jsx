@@ -55,15 +55,15 @@ function ToDoList(){
     return(
     <div className="w-full">
 
-        <div className='p-3 flex'>
+        <div className='flex'>
             <input
                 type="text"
                 placeholder="Enter a task"
-                className=''
+                className="m-4"
                 value={newTask}
                 onChange={handleInputChange}/>
             <button
-                className="blue-box mb-.5"
+                className="m-4 blue-box mb-.5"
                 onClick={addTask}>
                 Add
             </button>
@@ -73,21 +73,23 @@ function ToDoList(){
             {tasks.map((task, index) => 
                 <li key={index}>
                     <span className="text-gray-500">{task}</span>
-                        <button
-                            className='p-1 cursor-pointer'
-                            onClick={() => moveTaskUp(index)}>
-                            ↿
-                        </button>
-                        <button
-                            className='cursor-pointer'
-                            onClick={() => moveTaskDown(index)}>
-                            ⇂
-                        </button>
-                        <button
-                            className='p-1 cursor-pointer'
-                            onClick={() => deleteTask(index)}>
-                            🗑
-                        </button>
+                        <div className='flex justify-end'>
+                            <button
+                                className='p-1 cursor-pointer'
+                                onClick={() => moveTaskUp(index)}>
+                                ↿
+                            </button>
+                            <button
+                                className='cursor-pointer'
+                                onClick={() => moveTaskDown(index)}>
+                                ⇂
+                            </button>
+                            <button
+                                className='p-1 cursor-pointer'
+                                onClick={() => deleteTask(index)}>
+                                🗑
+                            </button>
+                        </div>
                 </li>)}
         </ol>
     </div>
