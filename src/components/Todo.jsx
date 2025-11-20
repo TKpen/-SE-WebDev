@@ -53,40 +53,41 @@ function ToDoList(){
     }
 
     return(
-    <div className = "to-do-list">
-        <h1>To-Do-List</h1>
+    <div className="w-full">
 
-        <div>
+        <div className='p-3 flex'>
             <input
                 type="text"
                 placeholder="Enter a task"
+                className=''
                 value={newTask}
                 onChange={handleInputChange}/>
             <button
-                className="add-button"
+                className="blue-box mb-.5"
                 onClick={addTask}>
                 Add
             </button>
         </div>
-        <ol>
+
+        <ol className="w-full p-3 space-y-1 text-lg">
             {tasks.map((task, index) => 
                 <li key={index}>
-                    <span className="text">{task}</span>
-                    <button
-                        className='delete-button'
-                        onClick={() => deleteTask(index)}>
-                        🗑
-                    </button>
-                    <button
-                        className='move-button'
-                        onClick={() => moveTaskUp(index)}>
-                        ↑
-                    </button>
-                    <button
-                        className='move-button'
-                        onClick={() => moveTaskDown(index)}>
-                        ↓
-                    </button>
+                    <span className="text-gray-500">{task}</span>
+                        <button
+                            className='p-1 cursor-pointer'
+                            onClick={() => moveTaskUp(index)}>
+                            ↿
+                        </button>
+                        <button
+                            className='cursor-pointer'
+                            onClick={() => moveTaskDown(index)}>
+                            ⇂
+                        </button>
+                        <button
+                            className='p-1 cursor-pointer'
+                            onClick={() => deleteTask(index)}>
+                            🗑
+                        </button>
                 </li>)}
         </ol>
     </div>
