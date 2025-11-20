@@ -58,7 +58,7 @@ export default function Notes({ storageKey = "notes.v1", className = "", onChang
 
         <ul className="space-y-1 text-sm p-2">
           {notes.length === 0 && (
-            <li className="text-sm text-gray-500">No notes yet—make one!</li>
+            <li className="text-sm text-gray-500 dark:text-white">No notes yet—make one!</li>
           )}
           {notes
             .slice()
@@ -68,7 +68,7 @@ export default function Notes({ storageKey = "notes.v1", className = "", onChang
                 key={n.id}
                 onClick={() => setActiveId(n.id)}
                 className={`group flex items-center justify-between gap-2 p-2 rounded-lg cursor-pointer
-                  ${n.id === activeId ? "bg-blue-50" : "hover:bg-gray-50"}`}
+                  ${n.id === activeId ? "bg-blue-50 dark:bg-gray-700" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
               >
                 <div className="min-w-0">
                   <div className="font-medium truncate">{n.title || "Untitled"}</div>
@@ -91,24 +91,26 @@ export default function Notes({ storageKey = "notes.v1", className = "", onChang
       </aside>
 
       {/* Editor */}
-      <main className="h-full overflow-y-auto text-sm mt-4 text-gray-800">
+      <main className="h-full overflow-y-auto text-sm mt-4 text-gray-800 dark:text-white">
         {activeNote ? (
           <>
               <input
                 value={activeNote.title}
                 onChange={(e) => updateNote({ title: e.target.value })}
                 placeholder="Note title…"
-                className="w-full text-lg font-semibold border-b border-gray-300 focus:outline-none focus:border-blue-500 pb-1"
+                className="w-full text-lg font-semibold border-b border-gray-300 focus:outline-none 
+                focus:border-blue-500 pb-1 dark:border-gray-950"
               />
               <textarea
                 value={activeNote.body}
                 onChange={(e) => updateNote({ body: e.target.value })}
                 placeholder="Write your note..."
-                className="w-full h-full resize-none border border-gray-300 rounded p-3 focus:outline-none focus:ring focus:ring-blue-200"
+                className="w-full h-full resize-none border border-gray-300 rounded p-3 focus:outline-none 
+                focus:ring focus:ring-blue-200 dark:border-gray-950"
               />
           </>
         ) : (
-          <div className="text-gray-500 p-4">Select a note or create a new one.</div>
+          <div className="text-gray-500 p-4 dark:text-white">Select a note or create a new one.</div>
         )}
       </main>
       </div>
