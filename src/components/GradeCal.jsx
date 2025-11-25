@@ -66,12 +66,12 @@ export default function GradeCal() {
   };
 
   return (
-    <div className="w-full h-full overflow-y-auto p-4 text-sm text-gray-800 dark:text-white">
+    <div className="w-full h-full overflow-y-auto p-4 text-sm text-gray-800 dark:text-white scrollbar-hide">
 
 
 
       {/* Labels */}
-      <div className="grid grid-cols-[1fr_140px_140px] px-2 py-1 text-gray-600 font-semibold dark:text-white">
+      <div className="grid grid-cols-[1fr_140px_140px] px-2 py-1 text-gray-800 font-semibold dark:text-white">
         <p>ASSIGNMENT / EXAM</p>
         <p className="text-center">GRADE (%)</p>
         <p className="text-center">WEIGHT</p>
@@ -81,8 +81,8 @@ export default function GradeCal() {
       {rows.map((row) => (
         <div
           key={row.id}
-          className="grid grid-cols-[1fr_140px_140px] items-center gap-3 p-2 rounded-lg 
-          hover:bg-gray-50 border border-gray-200 mb-2 dark:bg-gray-700 dark:hover:bg-gray-800"
+          className="grid grid-cols-[540px_140px_140px_300px_300px] items-center gap-3 p-2 rounded-lg 
+          hover:bg-gray-50 border border-gray-200 mb-2 dark:bg-gray-900 dark:hover:bg-gray-800"
         >
           <input
             type="text"
@@ -107,25 +107,25 @@ export default function GradeCal() {
             onChange={(e) => handleChange(row.id, "weight", e.target.value)}
             className="border border-gray-300 rounded-lg px-3 py-2 text-center w-full focus:outline-none focus:ring focus:ring-blue-200"
           />
+
+          {/* Buttons */}
+          <div className="p-2 flex gap-2 items-center">
+            <button
+              onClick={handleAddRow}
+              className="secondary-box"
+            >
+              + Add Row
+            </button>
+
+            <button
+              onClick={handleCalculate}
+              className="hero-box"
+            >
+              Calculate
+            </button>
+          </div>
         </div>
       ))}
-
-      {/* Buttons */}
-      <div className="p-2 flex gap-2 items-center">
-        <button
-          onClick={handleAddRow}
-          className="blue-box px-4 py-2 rounded-lg"
-        >
-          + Add Row
-        </button>
-
-        <button
-          onClick={handleCalculate}
-          className="blue-box px-4 py-2 rounded-lg"
-        >
-          Calculate
-        </button>
-      </div>
 
       {/* Result / Error */}
       <div className="px-2 mt-2">

@@ -52,7 +52,7 @@ export default function Home() {
                         <div className="flex flex-wrap gap-4">
                             <Link
                                 to="/dashboard"
-                                className="rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-medium text-slate-900 shadow-lg shadow-cyan-500/30 hover:bg-cyan-400 transition"
+                                className="hero-box"
                             >
                                 Open Dashboard
                             </Link>

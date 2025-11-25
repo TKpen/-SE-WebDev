@@ -17,3 +17,13 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+.hero-box {
+    @apply rounded-xl bg-cyan-500 px-5 py-2.5 text-sm font-medium 
+    text-slate-900 shadow-lg shadow-cyan-500/30 hover:bg-cyan-400 transition
+}
+
+.secondary-box {
+    @apply rounded-xl border border-slate-600 bg-slate-900/70 px-5 py-2.5 
+    text-sm font-medium text-slate-100 hover:border-cyan-400/80 hover:text-cyan-100 transition
+}

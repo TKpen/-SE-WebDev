@@ -14,7 +14,7 @@ export default function Dashboard() {
     return (
         <div className="min-h-screen bg-gray-200 dark:bg-gray-900 text-black dark:text-white">
             {/* Header */}
-            <header className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <header className="flex justify-between items-center p-4 border-b border-gray-300 dark:border-gray-900 bg-white dark:bg-gray-900">
                 <Link
                     to="/"
                     className="block h-10 w-10 text-left text-sm hover:bg-gray-200 dark:hover:bg-gray-900 hover:rounded"
