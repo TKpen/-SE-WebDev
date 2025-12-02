@@ -1,140 +1,285 @@
 import { useState } from "react";
 
 export default function GradeCal() {
-  const [rows, setRows] = useState([
-    { id: 1, name: "", grade: "", weight: "" },
+  const [weightClasses, setWeightClasses] = useState([
+    { id: "homework", label: "Homework", weight: "10" },
+    { id: "quiz", label: "Quizzes", weight: "15" },
+    { id: "exam", label: "Exams", weight: "40" },
   ]);
+
+  const [rows, setRows] = useState([
+    { id: 1, name: "", grade: "", weightClassId: "homework", editing: true }
+  ]);
+
+  const [nextId, setNextId] = useState(2);
+  const [newRowCategory, setNewRowCategory] = useState("homework");
+
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleChange = (id, field, value) => {
-    setRows((prev) =>
-      prev.map((row) =>
-        row.id === id ? { ...row, [field]: value } : row
-      )
-    );
-  };
+  let percent = result || 0;
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
 
-  const handleAddRow = () => {
-    setRows((prev) => [
-      ...prev,
-      {
-        id: prev.length ? prev[prev.length - 1].id + 1 : 1,
-        name: "",
-        grade: "",
-        weight: "",
-      },
-    ]);
-  };
+  function handleRowChange(rowId, field, value) {
+    const copy = [...rows];
 
-  const handleCalculate = () => {
-    const validRows = rows.filter(
-      (r) => r.grade.trim() !== "" && r.weight.trim() !== ""
-    );
-
-    if (validRows.length === 0) {
-      setError("Fill in at least one grade and weight.");
-      setResult(null);
-      return;
+    for (let i = 0; i < copy.length; i++) {
+      if (copy[i].id === rowId) {
+        const updated = { ...copy[i] };
+        updated[field] = value;
+        copy[i] = updated;
+      }
     }
 
-    let totalWeighted = 0;
-    let totalWeight = 0;
+    setRows(copy);
+  }
 
-    for (const row of validRows) {
-      const g = parseFloat(row.grade);
-      const w = parseFloat(row.weight);
+  function handleAddRow() {
+    const newRow = {
+      id: nextId,
+      name: "",
+      grade: "",
+      weightClassId: newRowCategory,
+      editing: true
+    };
 
-      if (isNaN(g) || isNaN(w)) {
-        setError("All grades and weights must be valid numbers.");
-        setResult(null);
-        return;
+    setRows([newRow, ...rows]);
+    setNextId(nextId + 1);
+  }
+
+  function deleteRow(id) {
+    const copy = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].id !== id) copy.push(rows[i]);
+    }
+
+    setRows(copy);
+  }
+
+  function toggleEdit(id) {
+    const copy = [...rows];
+
+    for (let i = 0; i < copy.length; i++) {
+      if (copy[i].id === id) {
+        const updated = { ...copy[i] };
+        updated.editing = !updated.editing;
+        copy[i] = updated;
+      }
+    }
+
+    setRows(copy);
+  }
+
+  function handleCategoryChange(catId, field, value) {
+    const list = [];
+
+    for (let i = 0; i < weightClasses.length; i++) {
+      const c = weightClasses[i];
+      if (c.id === catId) {
+        const u = { ...c };
+        u[field] = value;
+        list.push(u);
+      } else list.push(c);
+    }
+
+    setWeightClasses(list);
+  }
+
+  function handleCalculate() {
+    let weightedSum = 0;
+    let weightTotal = 0;
+
+    for (let i = 0; i < rows.length; i++) {
+      const g = parseFloat(rows[i].grade);
+      if (isNaN(g)) continue;
+
+      let w = 0;
+      for (let j = 0; j < weightClasses.length; j++) {
+        if (weightClasses[j].id === rows[i].weightClassId) {
+          w = parseFloat(weightClasses[j].weight);
+        }
       }
 
-      totalWeighted += g * w;
-      totalWeight += w;
+      weightedSum += g * w;
+      weightTotal += w;
     }
 
-    if (totalWeight === 0) {
-      setError("Total weight cannot be 0.");
+    if (weightTotal === 0) {
+      setError("Total weight cannot be zero.");
       setResult(null);
       return;
     }
 
     setError(null);
-    setResult(totalWeighted / totalWeight);
-  };
+    setResult(weightedSum / weightTotal);
+  }
 
   return (
-    <div className="w-full h-full overflow-y-auto p-4 text-sm text-gray-800 dark:text-white scrollbar-hide">
+    <div className="p-4 text-sm text-gray-800 dark:text-white w-full">
 
+      {/* EDIT WEIGHT CATEGORIES */}
+      <div className="mb-6 border-b pb-4">
+        <p className="text-xs font-semibold mb-2">Edit Weight Categories</p>
 
+        {weightClasses.map((c) => (
+          <div key={c.id} className="flex flex-col sm:flex-row gap-3 mb-2">
+            <input
+              type="text"
+              value={c.label}
+              onChange={(e) =>
+                handleCategoryChange(c.id, "label", e.target.value)
+              }
+              className="border px-2 py-1 rounded text-xs dark:bg-gray-950 w-full"
+            />
 
-      {/* Labels */}
-      <div className="grid grid-cols-[1fr_140px_140px] px-2 py-1 text-gray-800 font-semibold dark:text-white">
-        <p>ASSIGNMENT / EXAM</p>
-        <p className="text-center">GRADE (%)</p>
-        <p className="text-center">WEIGHT</p>
+            <input
+              type="number"
+              value={c.weight}
+              onChange={(e) =>
+                handleCategoryChange(c.id, "weight", e.target.value)
+              }
+              className="border px-2 py-1 rounded text-xs dark:bg-gray-950 w-24"
+            />
+          </div>
+        ))}
       </div>
 
-      {/* Rows */}
-      {rows.map((row) => (
-        <div
-          key={row.id}
-          className="grid grid-cols-[540px_140px_140px_300px_300px] items-center gap-3 p-2 rounded-lg 
-          hover:bg-gray-50 border border-gray-200 mb-2 dark:bg-gray-900 dark:hover:bg-gray-800"
-        >
-          <input
-            type="text"
-            placeholder="Assignment name"
-            value={row.name}
-            onChange={(e) => handleChange(row.id, "name", e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring focus:ring-blue-200"
-          />
+      {/* TABLE HEADING */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 font-semibold px-2 text-xs uppercase">
+        <p>Assignment</p>
+        <p className="sm:text-center mt-1 sm:mt-0">Grade (%)</p>
+        <p className="sm:text-center mt-1 sm:mt-0">Category</p>
+        <p className="sm:text-center mt-1 sm:mt-0">Actions</p>
+      </div>
 
-          <input
-            type="number"
-            placeholder="85"
-            value={row.grade}
-            onChange={(e) => handleChange(row.id, "grade", e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-center w-full focus:outline-none focus:ring focus:ring-blue-200"
-          />
+      {/* ROWS */}
+      {weightClasses.map((cat) => {
+        const catRows = rows.filter((r) => r.weightClassId === cat.id);
+        if (catRows.length === 0) return null;
 
-          <input
-            type="number"
-            placeholder="20"
-            value={row.weight}
-            onChange={(e) => handleChange(row.id, "weight", e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-center w-full focus:outline-none focus:ring focus:ring-blue-200"
-          />
+        return (
+          <div key={cat.id} className="mt-4">
+            <p className="text-xs font-semibold mb-1">{cat.label}</p>
 
-          {/* Buttons */}
-          <div className="p-2 flex gap-2 items-center">
-            <button
-              onClick={handleAddRow}
-              className="secondary-box"
+            {catRows.map((row) => (
+              <div
+                key={row.id}
+                className="grid grid-cols-1 sm:grid-cols-4 gap-3 p-2 border rounded mb-2 dark:bg-gray-900 w-full"
+              >
+                {/* Assignment */}
+                <input
+                  type="text"
+                  value={row.name}
+                  disabled={!row.editing}
+                  onChange={(e) =>
+                    handleRowChange(row.id, "name", e.target.value)
+                  }
+                  className={`border px-3 py-2 rounded dark:bg-gray-950 w-full ${
+                    !row.editing && "opacity-60 cursor-not-allowed"
+                  }`}
+                  placeholder="Assignment name"
+                />
+
+                {/* Grade */}
+                <input
+                  type="number"
+                  value={row.grade}
+                  disabled={!row.editing}
+                  onChange={(e) =>
+                    handleRowChange(row.id, "grade", e.target.value)
+                  }
+                  className={`border px-3 py-2 rounded text-center dark:bg-gray-950 w-full ${
+                    !row.editing && "opacity-60 cursor-not-allowed"
+                  }`}
+                  placeholder="85"
+                />
+
+                {/* Category */}
+                <select
+                  value={row.weightClassId}
+                  disabled={!row.editing}
+                  onChange={(e) =>
+                    handleRowChange(row.id, "weightClassId", e.target.value)
+                  }
+                  className={`border px-3 py-2 rounded dark:bg-gray-950 w-full text-sm ${
+                    !row.editing && "opacity-60 cursor-not-allowed"
+                  }`}
+                >
+                  {weightClasses.map((c) => (
+                    <option key={c.id} value={c.id}>{c.label}</option>
+                  ))}
+                </select>
+
+                {/* Actions */}
+                <div className="flex gap-2 justify-end items-center w-full">
+                  <button
+                    onClick={() => toggleEdit(row.id)}
+                    className="px-3 py-2 border rounded text-xs"
+                  >
+                    {row.editing ? "Lock" : "Edit"}
+                  </button>
+                  <button
+                    onClick={() => deleteRow(row.id)}
+                    className="px-3 py-2 border border-red-400 text-red-600 rounded text-xs"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      })}
+
+      {/* ERROR */}
+      {error && <p className="text-red-600 text-xs mt-4">{error}</p>}
+
+      {/* BOTTOM CONTROLS */}
+      <div className="mt-6 flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row justify-between gap-3">
+
+          <div className="flex items-center gap-2">
+            <p className="text-xs font-semibold">New row category:</p>
+            <select
+              value={newRowCategory}
+              onChange={(e) => setNewRowCategory(e.target.value)}
+              className="border rounded px-2 py-1 text-xs dark:bg-gray-900"
             >
+              {weightClasses.map((c) => (
+                <option key={c.id} value={c.id}>{c.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex gap-2">
+            <button onClick={handleAddRow} className="secondary-box">
               + Add Row
             </button>
-
-            <button
-              onClick={handleCalculate}
-              className="hero-box"
-            >
+            <button onClick={handleCalculate} className="hero-box">
               Calculate
             </button>
           </div>
-        </div>
-      ))}
 
-      {/* Result / Error */}
-      <div className="px-2 mt-2">
-        {error && <p className="text-red-600 text-xs">{error}</p>}
-        {result !== null && !error && (
-          <p className="text-gray-800 text-sm dark:text-white">
-            Current grade:{" "}
-            <span className="font-semibold">{result.toFixed(2)}%</span>
-          </p>
+        </div>
+
+        {/* RESULT BAR */}
+        {result !== null && (
+          <div className="mt-2">
+            <p className="text-sm mb-1">
+              Current grade: <b>{result.toFixed(2)}%</b>
+            </p>
+
+            <div className="w-full h-6 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
+              <div
+                className="hero-box h-full flex items-center justify-center text-[11px] text-white"
+                style={{ width: percent + "%" }}
+              >
+                {percent.toFixed(1)}%
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
