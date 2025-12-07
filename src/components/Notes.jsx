@@ -187,7 +187,7 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "" }) 
       <div className="grid grid-cols-[250px_1fr] w-full h-full">
 
         {/* Sidebar (Folder and Note List) */}
-        <aside className="h-full overflow-y-auto pr-3 border-r border-gray-700 bg-gray-800">
+        <aside className="h-full overflow-y-auto scrollbar-hide pr-3 border-r border-gray-700 bg-gray-800">
           <div className="p-3 border-b border-gray-700">
             <button
               onClick={createNote}

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import homeLogo from "../images/WebAppHomeLogo.png"
+import Gestures from "../components/TitleButton";
 
 export default function Home() {
     return (
@@ -18,9 +19,8 @@ export default function Home() {
                 {/* Top bar to match dashboard */}
                 <header className="mb-12 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/90">
-                            {/* simple icon block */}
-                            <img src={homeLogo}/>
+                        <div className="">
+                            <Gestures />
                         </div>
                         <span className="text-lg font-semibold tracking-tight">
                             Student Organizer
