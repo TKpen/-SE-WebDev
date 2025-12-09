@@ -74,7 +74,7 @@ export default function Home() {
                                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
                             </div>
 
-                            {/* Fake modules referencing your real dashboard */}
+                            {/* Fake modules referencing the real dashboard */}
                             <div className="grid gap-3">
                                 <div className="rounded-xl bg-slate-800/90 p-3">
                                     <div className="mb-2 flex items-center justify-between text-xs text-slate-300">

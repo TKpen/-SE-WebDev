@@ -49,7 +49,7 @@ export default function Modules() {
                     <motion.div
                         className="flex flex-col h-full"
                         animate={{
-                            scale: draggingID === "notes" ? 1.03 : 1,
+                            scale: draggingID === "notes" ? 1.02 : 1,
                             boxShadow:
                                 draggingID === "notes"
                                 ? "0 18px 40px rgba(0,0,0,0.35)"
@@ -73,7 +73,7 @@ export default function Modules() {
                     <motion.div
                         className="flex flex-col h-full"
                         animate={{
-                            scale:draggingID === "todo" ? 1.03 : 1,
+                            scale:draggingID === "todo" ? 1.02 : 1,
                             boxShadow:
                             draggingID === "todo"
                                 ? "0 18px 40px rgba(0,0,0,0.35)"
@@ -99,7 +99,7 @@ export default function Modules() {
                     <motion.div 
                         className="flex flex-col h-full"
                         animate={{
-                            scale: draggingID === "gradeCalc" ? 1.03 : 1,
+                            scale: draggingID === "gradeCalc" ? 1.02 : 1,
                             boxShadow:
                                 draggingID === "gradeCalc"
                                     ? "0 18px 40px rgba(0,0,0,0.35)"
