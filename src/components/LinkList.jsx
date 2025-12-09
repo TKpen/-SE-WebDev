@@ -171,6 +171,8 @@ function LinkList() {
                 )}
             </div>
 
+            <h2 className="text-xl font-semibold text-gray-300 mb-6"></h2>
+
             {showForm && (
                 <div className='p-4 mb-6 bg-gray-700 rounded-lg shadow-inner flex flex-col space-y-3'>
                     <input
@@ -196,8 +198,7 @@ function LinkList() {
             )}
 
             {links.length > 0 ? (
-                // FIX APPLIED: Set max columns to 4 (md:grid-cols-4 and lg:grid-cols-4)
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-x-4 gap-y-6 justify-items-center">
+                <div className="grid grid-cols-3 gap-x-4 gap-y-6 justify-items-center">
                     {links.map((linkItem, index) =>
                         editingIndex === index ? (
                             <div key={index} className="flex flex-col items-center p-2 bg-yellow-900 border border-yellow-700 rounded-lg w-full max-w-xs">
@@ -232,12 +233,12 @@ function LinkList() {
                                 {managementMode && (
                                     <div className='absolute top-0 right-0 flex space-x-1 p-1 z-10'>
                                         <button
-                                            className='p-1 bg-yellow-600 text-white rounded-full text-xs shadow-lg hover:bg-yellow-700'
+                                            className='bg-cyan-500 text-slate-900 shadow-lg shadow-cyan-500/30 hover:bg-cyan-400 transition rounded-full text-xs p-1'
                                             onClick={() => startEdit(index)}>
                                             Edit
                                         </button>
                                         <button
-                                            className='p-1 bg-red-600 text-white rounded-full text-xs shadow-lg hover:bg-red-700'
+                                            className='bg-red-600 text-white shadow-lg shadow-red-600/30 hover:bg-red-700 transition rounded-full text-xs p-1'
                                             onClick={(e) => {
                                                 e.preventDefault();
                                                 deleteLink(index);
@@ -275,7 +276,7 @@ function LinkList() {
                     )}
                 </div>
             ) : (
-                <p className="text-gray-400 text-center italic mt-10">No links added yet</p>
+                <p className="text-gray-400 text-center italic mt-10">No links added yet. Use the ⋮ menu in the top right to start!</p>
             )}
         </div>
     )

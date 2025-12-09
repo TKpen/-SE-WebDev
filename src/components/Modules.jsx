@@ -8,12 +8,13 @@ import "react-resizable/css/styles.css";
 import "../styles/modules.tailwind.css"
 import GradeCal from "./GradeCal";
 import LinkList from "./LinkList";
-import ToDoList from "./Todo";
+import ToDoList from "./TodoList";
 
 const layout = [
     {i: "gradeCalc", x: 0, y: 0, w: 12, h: 4, minH: 4, minW: 12},
     {i: "notes", x: 4, y: 0, w: 8, h: 8, minH: 8, minW: 4},
     {i: "todo", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 4},
+    {i: "linklist", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 3},
 ];
 
 const spring = {
@@ -88,6 +89,32 @@ export default function Modules() {
                         </div>
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
                             <ToDoList />
+                        </div>
+                    </motion.div>
+                </div>
+
+                <div
+                    key="linklist"
+                    className="module-box flex flex-col h-full"
+                >
+                    <motion.div
+                        className="flex flex-col h-full"
+                        animate={{
+                            scale:draggingID === "linklist" ? 1.03 : 1,
+                            boxShadow:
+                            draggingID === "linklist"
+                                ? "0 18px 40px rgba(0,0,0,0.35)"
+                                : "0 4px 15px rgba(0,0,0,0.15)",
+                        }}
+                        transition={spring}
+                        style={{height: "100%"}}
+                    >
+                        <div className="drag-box module-drag-handle flex-none sticky top-0 z-10">
+                            <h2 className="text-sm font-semibold p-2">Links</h2>
+                            <span className="text-xs text-gray-600 p-2">...</span>
+                        </div>
+                        <div className="flex-1 overflow-y-auto scrollbar-hide">
+                            <LinkList />
                         </div>
                     </motion.div>
                 </div>
