@@ -9,12 +9,14 @@ import "../styles/modules.tailwind.css"
 import GradeCal from "./GradeCal";
 import LinkList from "./LinkList";
 import ToDoList from "./TodoList";
+import Calendar from "./Calendar";
 
 const layout = [
     {i: "gradeCalc", x: 0, y: 0, w: 12, h: 4, minH: 4, minW: 12},
     {i: "notes", x: 4, y: 0, w: 8, h: 8, minH: 8, minW: 4},
     {i: "todo", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 4},
     {i: "linklist", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 3},
+    {i: "calendar", x: 8, y: 6, w: 6, h: 16, minH: 4, minW: 4},
 ];
 
 const spring = {
@@ -23,6 +25,15 @@ const spring = {
     damping: 28,
     mass: 0.6,
 }
+
+const getModuleAnimation = (id, draggingID) => ({
+    scale: draggingID === id ? 1.02 : 1,
+    y: draggingID === id ? -6 : 0,
+    boxShadow:
+        draggingID === id
+            ? "0 18px 30px rgba(0,0,0,0.45)" // Visible shadow when grabbed
+            : "0 0 0 rgba(0,0,0,0)", // Flat when resting
+})
 
 export default function Modules() {
     const [draggingID, setDraggingId] = React.useState(null)
@@ -43,23 +54,15 @@ export default function Modules() {
                     setDraggingId(null)
                 }}
             >
-                <div 
-                    key="notes"
-                    className="module-box flex flex-col h-full bg-white dark:bg-gray-950 rounded-lg shadow-md overflow-hidden"
-                >
+                <div key="notes" className="h-full">
                     <motion.div
-                        className="flex flex-col h-full"
-                        animate={{
-                            scale: draggingID === "notes" ? 1.02 : 1,
-                            boxShadow:
-                                draggingID === "notes"
-                                ? "0 18px 40px rgba(0,0,0,0.35)"
-                                : "0 4px 15px rgba(0,0,0,0.15)",
-                        }}
+                        className="module-box flex flex-col h-full overflow-hidden"
+                        animate={getModuleAnimation("notes", draggingID)}
                         transition={spring}
                     >
-                        <div className="drag-box module-drag-handle sticky top-0 z-10 bg-gray-300 dark:bg-gray-800 p-2">
-                            <h2 className="text-sm font-semibold">Notes</h2>
+                        <div className="drag-box module-drag-handle sticky top-0 z-10 bg-gray-800/90 p-2">
+                            <h2 className="text-sm font-semibold text-white">Notes</h2>
+                            <span className="text-xs text-gray-300 px-2 pb-2">...</span>
                         </div>
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
                             <Notes />
@@ -67,25 +70,15 @@ export default function Modules() {
                     </motion.div>
                 </div>
 
-                <div
-                    key="todo"
-                    className="module-box flex flex-col h-full"
-                >
+                <div key="todo" className="h-full">
                     <motion.div
-                        className="flex flex-col h-full"
-                        animate={{
-                            scale:draggingID === "todo" ? 1.02 : 1,
-                            boxShadow:
-                            draggingID === "todo"
-                                ? "0 18px 40px rgba(0,0,0,0.35)"
-                                : "0 4px 15px rgba(0,0,0,0.15)",
-                        }}
+                        className="module-box flex flex-col h-full overflow-hidden"
+                        animate={getModuleAnimation("todo", draggingID)}
                         transition={spring}
-                        style={{height: "100%"}}
                     >
-                        <div className="drag-box module-drag-handle flex-none sticky top-0 z-10">
-                            <h2 className="text-sm font-semibold p-2">To-Do</h2>
-                            <span className="text-xs text-gray-600 p-2">...</span>
+                        <div className="drag-box module-drag-handle flex-none sticky top-0 z-10 bg-gray-800/90">
+                            <h2 className="text-sm font-semibold p-2 text-white">To-Do</h2>
+                            <span className="text-xs text-gray-300 px-2 pb-2">...</span>
                         </div>
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
                             <ToDoList />
@@ -93,25 +86,15 @@ export default function Modules() {
                     </motion.div>
                 </div>
 
-                <div
-                    key="linklist"
-                    className="module-box flex flex-col h-full"
-                >
+                <div key="linklist" className="h-full">
                     <motion.div
-                        className="flex flex-col h-full"
-                        animate={{
-                            scale:draggingID === "linklist" ? 1.03 : 1,
-                            boxShadow:
-                            draggingID === "linklist"
-                                ? "0 18px 40px rgba(0,0,0,0.35)"
-                                : "0 4px 15px rgba(0,0,0,0.15)",
-                        }}
+                        className="module-box flex flex-col h-full overflow-hidden"
+                        animate={getModuleAnimation("linklist", draggingID)}
                         transition={spring}
-                        style={{height: "100%"}}
                     >
-                        <div className="drag-box module-drag-handle flex-none sticky top-0 z-10">
-                            <h2 className="text-sm font-semibold p-2">Links</h2>
-                            <span className="text-xs text-gray-600 p-2">...</span>
+                        <div className="drag-box module-drag-handle flex-none sticky top-0 z-10 bg-gray-800/90">
+                            <h2 className="text-sm font-semibold p-2 text-white">Links</h2>
+                            <span className="text-xs text-gray-300 px-2 pb-2">...</span>
                         </div>
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
                             <LinkList />
@@ -119,28 +102,35 @@ export default function Modules() {
                     </motion.div>
                 </div>
 
-                <div
-                    key="gradeCalc"
-                    className="module-box flex flex-col h-full"
-                >
+                <div key="gradeCalc" className="h-full">
                     <motion.div 
-                        className="flex flex-col h-full"
-                        animate={{
-                            scale: draggingID === "gradeCalc" ? 1.02 : 1,
-                            boxShadow:
-                                draggingID === "gradeCalc"
-                                    ? "0 18px 40px rgba(0,0,0,0.35)"
-                                    : "0 4px 15px rgba(0,0,0,0.15",
-                        }} 
+                        className="module-box flex flex-col h-full overflow-hidden"
+                        animate={getModuleAnimation("gradeCalc", draggingID)} 
                         transition={spring}
-                        style={{height: "100%"}}
                     >
-                        <div className="drag-box module-drag-handle flex-none sticky top-0 z-10">
-                            <h2 className="text-sm font-semibold p-2">Grade Calculator</h2>
-                            <span className="text-xs text-gray-600 p-2">...</span>
+                        <div className="drag-box module-drag-handle flex-none sticky top-0 z-10 bg-gray-800/90">
+                            <h2 className="text-sm font-semibold p-2 text-white">Grade Calculator</h2>
+                            <span className="text-xs text-gray-300 px-2 pb-2">...</span>
                         </div>
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
                             <GradeCal />
+                        </div>
+                    </motion.div>
+                </div>
+                <div key="calendar" className="h-full">
+                    <motion.div
+                        className="module-box flex flex-col h-full overflow-hidden"
+                        animate={getModuleAnimation("calendar", draggingID)}
+                        transition={spring}
+                    >
+                        <div className="drag-box module-drag-handle flex-none sticky top-0 z-10 bg-gray-800/90">
+                            <h2 className="text-sm font-semibold p-2 text-white">Calendar</h2>
+                            <span className="text-xs text-gray-300 px-2 pb-2">
+                                Monthly overview
+                            </span>
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <Calendar />
                         </div>
                     </motion.div>
                 </div>
