@@ -1,4 +1,6 @@
-import { useState } from "react";
+// src/components/GradeCal.jsx
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 export default function GradeCal() {
   const [weightClasses, setWeightClasses] = useState([
@@ -17,9 +19,81 @@ export default function GradeCal() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
+  // ---------- Supabase state ----------
+  const [hasLoaded, setHasLoaded] = useState(false); // don't overwrite cloud on first load
+
   let percent = result || 0;
   if (percent < 0) percent = 0;
   if (percent > 100) percent = 100;
+
+  // ============ LOAD FROM SUPABASE ============
+  useEffect(() => {
+    async function loadGradeData() {
+      const res = await supabase.auth.getUser();
+      const user = res?.data?.user;
+
+      if (!user) {
+        setHasLoaded(true);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("user_data")
+        .select("grade_config")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!error && data && data.grade_config) {
+        const gd = data.grade_config;
+
+        if (gd.weightClasses && Array.isArray(gd.weightClasses)) {
+          setWeightClasses(gd.weightClasses);
+        }
+
+        if (gd.rows && Array.isArray(gd.rows) && gd.rows.length > 0) {
+          setRows(gd.rows);
+
+          // set nextId so new rows don't reuse old ids
+          let maxId = 0;
+          for (let i = 0; i < gd.rows.length; i++) {
+            const r = gd.rows[i];
+            if (typeof r.id === "number" && r.id > maxId) {
+              maxId = r.id;
+            }
+          }
+          setNextId(maxId + 1);
+        }
+      }
+
+      setHasLoaded(true);
+    }
+
+    loadGradeData();
+  }, []);
+
+  // ============ SAVE TO SUPABASE ============
+  useEffect(() => {
+    if (!hasLoaded) return;
+
+    async function saveGradeData() {
+      const res = await supabase.auth.getUser();
+      const user = res?.data?.user;
+      if (!user) return;
+
+      await supabase.from("user_data").upsert({
+        user_id: user.id,
+        grade_config: {
+          weightClasses: weightClasses,
+          rows: rows,
+        },
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    saveGradeData();
+  }, [weightClasses, rows, hasLoaded]);
+
+  // ============ LOCAL HANDLERS ============
 
   function handleRowChange(rowId, field, value) {
     const copy = [...rows];
@@ -116,9 +190,9 @@ export default function GradeCal() {
     setResult(weightedSum / weightTotal);
   }
 
+  // ============ UI ============
   return (
     <div className="p-4 text-sm text-gray-800 dark:text-white w-full">
-
       {/* EDIT WEIGHT CATEGORIES */}
       <div className="mb-6 border-b pb-4">
         <p className="text-xs font-semibold mb-2">Edit Weight Categories</p>
@@ -154,7 +228,7 @@ export default function GradeCal() {
         <p className="sm:text-center mt-1 sm:mt-0">Actions</p>
       </div>
 
-      {/* ROWS */}
+      {/* ROWS GROUPED BY CATEGORY */}
       {weightClasses.map((cat) => {
         const catRows = rows.filter((r) => r.weightClassId === cat.id);
         if (catRows.length === 0) return null;
@@ -208,7 +282,9 @@ export default function GradeCal() {
                   }`}
                 >
                   {weightClasses.map((c) => (
-                    <option key={c.id} value={c.id}>{c.label}</option>
+                    <option key={c.id} value={c.id}>
+                      {c.label}
+                    </option>
                   ))}
                 </select>
 
@@ -239,7 +315,6 @@ export default function GradeCal() {
       {/* BOTTOM CONTROLS */}
       <div className="mt-6 flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row justify-between gap-3">
-
           <div className="flex items-center gap-2">
             <p className="text-xs font-semibold">New row category:</p>
             <select
@@ -248,7 +323,9 @@ export default function GradeCal() {
               className="border rounded px-2 py-1 text-xs dark:bg-gray-900"
             >
               {weightClasses.map((c) => (
-                <option key={c.id} value={c.id}>{c.label}</option>
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
               ))}
             </select>
           </div>
@@ -261,7 +338,6 @@ export default function GradeCal() {
               Calculate
             </button>
           </div>
-
         </div>
 
         {/* RESULT BAR */}
