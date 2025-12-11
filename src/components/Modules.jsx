@@ -17,7 +17,7 @@ const defaultLayout = [
     {i: "notes", x: 4, y: 0, w: 8, h: 8, minH: 8, minW: 2.75},
     {i: "todo", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 4, maxH: 10},
     {i: "linklist", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 3},
-    {i: "calendar", x: 8, y: 6, w: 6, h: 16, minH: 4, minW: 4},
+    {i: "calendar", x: 4, y: 6, w: 6, h: 16, minH: 4, minW: 4},
 ];
 
 const spring = {
@@ -61,14 +61,28 @@ const getTodoAnimation = (draggingID, isTodoOpen) => {
   };
 };
 
+const getGradeCalcAnimation = (draggingID, isGradeDetailsOpen) => {
+    const base = getModuleAnimation("gradeCalc", draggingID)
+
+    if (!isGradeDetailsOpen) return base
+
+    return {
+        ...base,
+        scale: Math.max(base.scale || 1, 1.01),
+        boxShadow: "0 20px 40px rgba(0,0,0,0.55)",
+    }
+}
+
 export default function Modules() {
     const [draggingID, setDraggingId] = React.useState(null)
     const [isNotesEditorOpen, setIsNotesEditorOpen] = React.useState(false)
     const [isTodoOpen, setIsTodoOpen] = React.useState(true)
     const [todoTaskCount, setTodoTaskCount] = React.useState(0)
+    const [isGradeDetailsOpen, setIsGradeDetailsOpen] = React.useState(false)
 
     const [layout, setLayout] = React.useState(defaultLayout)
 
+    // Notes: Change width when editor open/closed
     React.useEffect(() => {
         setLayout((prevLayout) =>
             prevLayout.map((item) =>
@@ -79,6 +93,7 @@ export default function Modules() {
         )
     }, [isNotesEditorOpen])
 
+    // To-do: dynamic height based on open state + task count
     React.useEffect(() => {
         setLayout((prevLayout) => 
             prevLayout.map((item) => {
@@ -100,6 +115,21 @@ export default function Modules() {
         )
     }, [isTodoOpen, todoTaskCount])
 
+    // GradeCalc height depends on details panel
+    React.useEffect(() => {
+        setLayout((prevLayout) =>
+            prevLayout.map((item) =>
+                item.i === "gradeCalc"
+                    ? {
+                        ...item,
+                        h: isGradeDetailsOpen ? 19 : 5,
+                    }
+                : item
+            )
+        )
+    }, [isGradeDetailsOpen])
+
+    // Function that allows modules to change freely where ever on the page
     const handleLayoutChange = React.useCallback(
         (nextLayout) => {
             setLayout((prevLayout) => 
@@ -129,6 +159,7 @@ export default function Modules() {
                     setDraggingId(null)
                 }}
             >
+                {/* Notes */}
                 <div key="notes" className="h-full">
                     <motion.div
                         className="module-box flex flex-col h-full overflow-hidden"
@@ -145,6 +176,7 @@ export default function Modules() {
                     </motion.div>
                 </div>
 
+                {/* To-Do List */}
                 <div key="todo" className="h-full">
                     <motion.div
                         className="module-box flex flex-col h-full overflow-hidden"
@@ -164,6 +196,7 @@ export default function Modules() {
                     </motion.div>
                 </div>
 
+                {/* Links List */}
                 <div key="linklist" className="h-full">
                     <motion.div
                         className="module-box flex flex-col h-full overflow-hidden"
@@ -180,21 +213,28 @@ export default function Modules() {
                     </motion.div>
                 </div>
 
+                {/* Grade Calculator */}
                 <div key="gradeCalc" className="h-full">
                     <motion.div 
-                        className="module-box flex flex-col h-full overflow-hidden"
-                        animate={getModuleAnimation("gradeCalc", draggingID)} 
-                        transition={spring}
+                        className={`module-box flex flex-col h-full overflow-hidden ${
+                            isGradeDetailsOpen ? "mb-6" : ""
+                        }`}
+                        animate={getGradeCalcAnimation(draggingID, isGradeDetailsOpen)} 
+                        transition={ isGradeDetailsOpen ? bounceTransition : spring }
                     >
                         <div className="drag-box module-drag-handle flex-none sticky top-0 z-10 bg-gray-800/90">
                             <h2 className="text-sm font-semibold p-2 text-white">Grade Calculator</h2>
                             <span className="text-xs text-gray-300 px-2 pb-2">...</span>
                         </div>
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
-                            <GradeCal />
+                            <GradeCal
+                                onDetailsOpenChange={setIsGradeDetailsOpen}
+                            />
                         </div>
                     </motion.div>
                 </div>
+
+                {/* Calendar */}
                 <div key="calendar" className="h-full">
                     <motion.div
                         className="module-box flex flex-col h-full overflow-hidden"

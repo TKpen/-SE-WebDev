@@ -31,7 +31,7 @@ export default function SettingsMenu({ user, onLogout }) {
           className="absolute top-8 right-0 w-[150px] z-20 list-none p-4"
           variants={navVariants}
         >
-          <motion.li variants={itemVariants} className="mb-2">
+          {/* <motion.li variants={itemVariants} className="mb-2">
             <button
               onClick={() => setIsDark((prev) => !prev)}
               className="w-full text-sm text-left px-4 py-2 rounded bg-white dark:bg-gray-600 text-black dark:text-white"
@@ -56,7 +56,7 @@ export default function SettingsMenu({ user, onLogout }) {
             >
               Profile
             </Link>
-          </motion.li>
+          </motion.li> */}
 
           {user && (
             <motion.li variants={itemVariants}>
@@ -98,12 +98,14 @@ const sidebarVariants = {
 
 const navVariants = {
   open: {
+    pointerEvent: "auto",
     transition: {
       delayChildren: 0.2,
       staggerChildren: 0.07,
     },
   },
   closed: {
+    pointerEvents: "none",
     transition: {
       staggerChildren: 0.05,
       staggerDirection: -1,
