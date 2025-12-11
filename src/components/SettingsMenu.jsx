@@ -98,7 +98,7 @@ const sidebarVariants = {
 
 const navVariants = {
   open: {
-    pointerEvent: "auto",
+    pointerEvents: "auto",
     transition: {
       delayChildren: 0.2,
       staggerChildren: 0.07,

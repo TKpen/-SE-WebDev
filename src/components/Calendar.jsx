@@ -1,4 +1,6 @@
-import React from "react";
+// src/components/Calendar.jsx
+import React, { useState, useEffect } from "react";
+import { supabase } from "../lib/supabaseClient";
 
 const daysShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -54,16 +56,19 @@ function formatDateKey(date) {
 }
 
 export default function Calendar() {
-  const [currentMonth, setCurrentMonth] = React.useState(() => {
+  const [currentMonth, setCurrentMonth] = useState(() => {
     const now = new Date();
     return new Date(now.getFullYear(), now.getMonth(), 1);
   });
 
-  const [selectedDate, setSelectedDate] = React.useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   // { "2025-12-09": [{id, title}, ...], ... }
-  const [eventsByDate, setEventsByDate] = React.useState({});
-  const [newEventTitle, setNewEventTitle] = React.useState("");
+  const [eventsByDate, setEventsByDate] = useState({});
+  const [newEventTitle, setNewEventTitle] = useState("");
+
+  // to avoid overwriting Supabase data before we load it
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   const monthMatrix = buildMonthMatrix(currentMonth);
 
@@ -72,8 +77,54 @@ export default function Calendar() {
     year: "numeric",
   });
 
+  // ========= LOAD FROM SUPABASE =========
+  useEffect(() => {
+    async function loadCalendar() {
+      const res = await supabase.auth.getUser();
+      const user = res?.data?.user;
+
+      if (!user) {
+        setHasLoaded(true);
+        return;
+      }
+
+      const { data: row, error } = await supabase
+        .from("user_data")
+        .select("calendar_events")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!error && row && row.calendar_events) {
+        setEventsByDate(row.calendar_events);
+      }
+
+      setHasLoaded(true);
+    }
+
+    loadCalendar();
+  }, []);
+
+  // ========= SAVE TO SUPABASE =========
+  useEffect(() => {
+    if (!hasLoaded) return;
+
+    async function saveCalendar() {
+      const res = await supabase.auth.getUser();
+      const user = res?.data?.user;
+      if (!user) return;
+
+      await supabase.from("user_data").upsert({
+        user_id: user.id,
+        calendar_events: eventsByDate,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    saveCalendar();
+  }, [eventsByDate, hasLoaded]);
+
   const handlePrev = () => {
-    setCurrentMonth(prev => {
+    setCurrentMonth((prev) => {
       const year = prev.getFullYear();
       const month = prev.getMonth();
       return new Date(year, month - 1, 1);
@@ -81,7 +132,7 @@ export default function Calendar() {
   };
 
   const handleNext = () => {
-    setCurrentMonth(prev => {
+    setCurrentMonth((prev) => {
       const year = prev.getFullYear();
       const month = prev.getMonth();
       return new Date(year, month + 1, 1);
@@ -99,7 +150,7 @@ export default function Calendar() {
     if (!title) return;
 
     const key = formatDateKey(selectedDate);
-    setEventsByDate(prev => ({
+    setEventsByDate((prev) => ({
       ...prev,
       [key]: [
         ...(prev[key] || []),
@@ -110,9 +161,9 @@ export default function Calendar() {
   };
 
   const handleDeleteEvent = (key, id) => {
-    setEventsByDate(prev => ({
+    setEventsByDate((prev) => ({
       ...prev,
-      [key]: prev[key].filter(ev => ev.id !== id),
+      [key]: prev[key].filter((ev) => ev.id !== id),
     }));
   };
 
@@ -160,12 +211,7 @@ export default function Calendar() {
       <div className="grid flex-1 grid-cols-7 gap-px bg-slate-800 text-xs">
         {monthMatrix.flat().map((cell, idx) => {
           if (!cell) {
-            return (
-              <div
-                key={idx}
-                className="bg-slate-950"
-              />
-            );
+            return <div key={idx} className="bg-slate-950" />;
           }
 
           const { date, isToday } = cell;
