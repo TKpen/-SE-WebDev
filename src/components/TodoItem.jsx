@@ -1,4 +1,6 @@
 import React from 'react';
+import { motion } from "framer-motion";
+import { springTransition } from '../hooks/motionTransitions';
 
 const getPriorityColor = (priority) => {
   switch (priority) {
@@ -16,10 +18,19 @@ const getPriorityColor = (priority) => {
 const TodoItem = ({ task, toggleComplete, deleteTask }) => {
   const priorityColor = getPriorityColor(task.priority);
 
-  return (
-    <div
-      className={`flex items-center justify-between p-2 mb-1 rounded-md transition duration-200 
-      ${task.completed ? 'bg-gray-700 opacity-70' : 'bg-gray-800 hover:bg-gray-700'} text-sm`}
+ return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={springTransition}
+      className={`flex items-center justify-between p-2 mb-1 rounded-md transition 
+      ${
+        task.completed
+          ? "bg-gray-700 opacity-70"
+          : "bg-gray-800 hover:bg-gray-700"
+      } text-sm`}
     >
       <div className="flex items-center overflow-hidden">
         <input
@@ -30,15 +41,23 @@ const TodoItem = ({ task, toggleComplete, deleteTask }) => {
         />
 
         <div>
-          <span className={`font-medium ${task.completed ? 'line-through text-gray-400' : 'text-white'}`}>
+          <span
+            className={`font-medium ${
+              task.completed ? "line-through text-gray-400" : "text-white"
+            }`}
+          >
             {task.text}
           </span>
           <div className="flex items-center space-x-2 text-xs mt-0.5 text-gray-400">
-            {task.dueDate && (
-              <span>{task.dueDate}</span>
-            )}
-            <span className={`flex items-center ${task.dueDate ? 'border-l border-gray-600 pl-2' : ''}`}>
-              <span className={`w-1.5 h-1.5 rounded-full mr-1 ${priorityColor}`}></span>
+            {task.dueDate && <span>{task.dueDate}</span>}
+            <span
+              className={`flex items-center ${
+                task.dueDate ? "border-l border-gray-600 pl-2" : ""
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full mr-1 ${priorityColor}`}
+              ></span>
               {task.priority}
             </span>
           </div>
@@ -50,11 +69,22 @@ const TodoItem = ({ task, toggleComplete, deleteTask }) => {
         className="text-red-400 hover:text-red-500 p-1 ml-2 rounded hover:bg-gray-600 transition"
         aria-label={`Delete task: ${task.text}`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </button>
-    </div>
+    </motion.div>
   );
 };
 

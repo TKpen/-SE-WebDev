@@ -10,11 +10,12 @@ import GradeCal from "./GradeCal";
 import LinkList from "./LinkList";
 import ToDoList from "./TodoList";
 import Calendar from "./Calendar";
+import { bounceTransition, springTransition } from "../hooks/motionTransitions.js";
 
-const layout = [
+const defaultLayout = [
     {i: "gradeCalc", x: 0, y: 0, w: 12, h: 4, minH: 4, minW: 12},
-    {i: "notes", x: 4, y: 0, w: 8, h: 8, minH: 8, minW: 4},
-    {i: "todo", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 4},
+    {i: "notes", x: 4, y: 0, w: 8, h: 8, minH: 8, minW: 2.75},
+    {i: "todo", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 4, maxH: 10},
     {i: "linklist", x: 0, y: 6, w: 4, h: 8, minH: 4, minW: 3},
     {i: "calendar", x: 8, y: 6, w: 6, h: 16, minH: 4, minW: 4},
 ];
@@ -35,8 +36,81 @@ const getModuleAnimation = (id, draggingID) => ({
             : "0 0 0 rgba(0,0,0,0)", // Flat when resting
 })
 
+const getNotesAnimation = (draggingID, isNotesEditorOpen) => {
+    const base = getModuleAnimation("notes", draggingID);
+
+    if (!isNotesEditorOpen) return base;
+
+    return {
+        ...base,
+        scale: Math.max(base.scale || 1, 1.01),
+        boxShadow:
+            "0 20px 40px rgba(0,0,0,0.55)",
+    }
+}
+
+const getTodoAnimation = (draggingID, isTodoOpen) => {
+  const base = getModuleAnimation("todo", draggingID);
+
+  if (!isTodoOpen) return base;
+
+  return {
+    ...base,
+    scale: Math.max(base.scale || 1, 1.01),
+    boxShadow: "0 18px 32px rgba(0,0,0,0.5)",
+  };
+};
+
 export default function Modules() {
     const [draggingID, setDraggingId] = React.useState(null)
+    const [isNotesEditorOpen, setIsNotesEditorOpen] = React.useState(false)
+    const [isTodoOpen, setIsTodoOpen] = React.useState(true)
+    const [todoTaskCount, setTodoTaskCount] = React.useState(0)
+
+    const [layout, setLayout] = React.useState(defaultLayout)
+
+    React.useEffect(() => {
+        setLayout((prevLayout) =>
+            prevLayout.map((item) =>
+                item.i === "notes"
+                    ? {...item, w: isNotesEditorOpen ? 8: 2.75}
+                    : item
+            )
+        )
+    }, [isNotesEditorOpen])
+
+    React.useEffect(() => {
+        setLayout((prevLayout) => 
+            prevLayout.map((item) => {
+                if(item.i !== "todo") return item
+
+                const closedH = 5
+                const baseOpenH = 7
+                const rowsPerTask = 0.6
+                const maxH = 18
+
+                if(!isTodoOpen) {
+                    return { ...item, h: closedH }
+                }
+
+                const extraRows = Math.ceil(todoTaskCount * rowsPerTask)
+                const newH = Math.min(baseOpenH + extraRows, maxH)
+                return { ...item, h: newH }
+            })
+        )
+    }, [isTodoOpen, todoTaskCount])
+
+    const handleLayoutChange = React.useCallback(
+        (nextLayout) => {
+            setLayout((prevLayout) => 
+                nextLayout.map((item) => {
+                    const prevItem = prevLayout.find((p) => p.i === item.i) || {}
+                    return { ...prevItem, ...item }
+                })
+            )
+        },
+        []
+    )
 
     return (
         <div>
@@ -47,6 +121,7 @@ export default function Modules() {
                 rowHeight={30}
                 width={1200}
                 draggableHandle=".module-drag-handle"
+                onLayoutChange={handleLayoutChange}
                 onDragStart={(_layout, oldItem) => {
                     setDraggingId(oldItem.i)
                 }}
@@ -57,15 +132,15 @@ export default function Modules() {
                 <div key="notes" className="h-full">
                     <motion.div
                         className="module-box flex flex-col h-full overflow-hidden"
-                        animate={getModuleAnimation("notes", draggingID)}
-                        transition={spring}
+                        animate={getNotesAnimation(draggingID, isNotesEditorOpen)}
+                        transition={isNotesEditorOpen ? bounceTransition : spring}
                     >
                         <div className="drag-box module-drag-handle sticky top-0 z-10 bg-gray-800/90 p-2">
                             <h2 className="text-sm font-semibold text-white">Notes</h2>
                             <span className="text-xs text-gray-300 px-2 pb-2">...</span>
                         </div>
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
-                            <Notes />
+                            <Notes onEditorOpenChange={setIsNotesEditorOpen} />
                         </div>
                     </motion.div>
                 </div>
@@ -73,15 +148,18 @@ export default function Modules() {
                 <div key="todo" className="h-full">
                     <motion.div
                         className="module-box flex flex-col h-full overflow-hidden"
-                        animate={getModuleAnimation("todo", draggingID)}
-                        transition={spring}
+                        animate={getTodoAnimation(draggingID, isTodoOpen)}
+                        transition={isTodoOpen ? bounceTransition : spring}
                     >
                         <div className="drag-box module-drag-handle flex-none sticky top-0 z-10 bg-gray-800/90">
                             <h2 className="text-sm font-semibold p-2 text-white">To-Do</h2>
                             <span className="text-xs text-gray-300 px-2 pb-2">...</span>
                         </div>
                         <div className="flex-1 overflow-y-auto scrollbar-hide">
-                            <ToDoList />
+                            <ToDoList 
+                                onListOpenChange={setIsTodoOpen}
+                                onTaskCountChange={setTodoTaskCount}
+                            />
                         </div>
                     </motion.div>
                 </div>
