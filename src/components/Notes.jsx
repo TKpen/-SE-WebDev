@@ -1,8 +1,10 @@
+// src/components/Notes.jsx
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { bounceTransition, springTransition } from "../hooks/motionTransitions";
-// --- Configuration Data ---
+import { supabase } from "../lib/supabaseClient";
 
+// --- Configuration Data ---
 const PRIORITY_LABELS = ["Low", "Medium", "High", "Exam/Quiz"];
 const PRIORITY_COLORS = {
   Low: "bg-green-600 text-white",
@@ -17,26 +19,22 @@ function generateSimpleId() {
 }
 
 // --- Main Component ---
-
-export default function Notes({ storageKey = "myNotesApp.v1", className = "", onEditorOpenChange, }) {
-  const [data, setData] = useState(() => {
-    try {
-      const storedData = localStorage.getItem(storageKey);
-      if (storedData) {
-        return JSON.parse(storedData);
-      }
-    } catch (error) {
-      console.error("Could not load notes from local storage:", error);
-    }
-    return {
-      notes: [],
-      folders: ["Class 101", "Project A"],
-    };
+export default function Notes({
+  className = "",
+  onEditorOpenChange,
+}) {
+  // all notes + folders live in this one object
+  const [data, setData] = useState({
+    notes: [],
+    folders: ["Class 101", "Project A"],
   });
 
   const [activeNoteId, setActiveNoteId] = useState(null);
   const [activeFolderFilter, setActiveFolderFilter] = useState(null);
-  const [isEditorOpen, setIsEditorOpen] = useState(false); // 👈 NEW
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  // to avoid overwriting Supabase data before the first load
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   function setEditorOpen(next) {
     setIsEditorOpen((prev) => {
@@ -48,10 +46,51 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
     });
   }
 
-  // Persistence
+  // LOAD FROM SUPABASE 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(data));
-  }, [data, storageKey]);
+    async function loadNotes() {
+      const res = await supabase.auth.getUser();
+      const user = res?.data?.user;
+
+      if (!user) {
+        setHasLoaded(true);
+        return;
+      }
+
+      const { data: row, error } = await supabase
+        .from("user_data")
+        .select("notes")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!error && row && row.notes) {
+        setData(row.notes);
+      }
+
+      setHasLoaded(true);
+    }
+
+    loadNotes();
+  }, []);
+
+  // SAVE TO SUPABASE 
+  useEffect(() => {
+    if (!hasLoaded) return;
+
+    async function saveNotes() {
+      const res = await supabase.auth.getUser();
+      const user = res?.data?.user;
+      if (!user) return;
+
+      await supabase.from("user_data").upsert({
+        user_id: user.id,
+        notes: data,
+        updated_at: new Date().toISOString(),
+      });
+    }
+
+    saveNotes();
+  }, [data, hasLoaded]);
 
   const activeNote = data.notes.find((n) => n.id === activeNoteId);
 
@@ -59,19 +98,21 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
 
   function createFolder() {
     const name = prompt("Enter the name for the new folder:");
-    if (name && name.trim()) {
-      const newFolderName = name.trim();
-      if (data.folders.includes(newFolderName)) {
-        alert("Folder already exists!");
-        return;
-      }
+    if (!name) return;
 
-      setData((currentData) => ({
-        ...currentData,
-        folders: [...currentData.folders, newFolderName],
-      }));
-      setActiveFolderFilter(newFolderName);
+    const newFolderName = name.trim();
+    if (!newFolderName) return;
+
+    if (data.folders.includes(newFolderName)) {
+      alert("Folder already exists!");
+      return;
     }
+
+    setData((currentData) => ({
+      ...currentData,
+      folders: [...currentData.folders, newFolderName],
+    }));
+    setActiveFolderFilter(newFolderName);
   }
 
   function createNote() {
@@ -100,9 +141,8 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
   function updateNote(partialUpdate) {
     if (!activeNoteId) return;
 
-    setData((currentData) => ({
-      ...currentData,
-      notes: currentData.notes.map((note) => {
+    setData((currentData) => {
+      const updatedNotes = currentData.notes.map((note) => {
         if (note.id === activeNoteId) {
           return {
             ...note,
@@ -111,19 +151,27 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
           };
         }
         return note;
-      }),
-    }));
+      });
+
+      return {
+        ...currentData,
+        notes: updatedNotes,
+      };
+    });
   }
 
   function deleteNote(idToDelete) {
-    if (window.confirm("Are you sure you want to delete this note?")) {
-      setData((currentData) => ({
-        ...currentData,
-        notes: currentData.notes.filter((note) => note.id !== idToDelete),
-      }));
-      if (activeNoteId === idToDelete) {
-        setActiveNoteId(null);
-      }
+    if (!window.confirm("Are you sure you want to delete this note?")) {
+      return;
+    }
+
+    setData((currentData) => ({
+      ...currentData,
+      notes: currentData.notes.filter((note) => note.id !== idToDelete),
+    }));
+
+    if (activeNoteId === idToDelete) {
+      setActiveNoteId(null);
     }
   }
 
@@ -171,7 +219,7 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
       key={note.id}
       onClick={() => {
         setActiveNoteId(note.id);
-        setEditorOpen(true); // 👈 open panel when you click a note
+        setEditorOpen(true);
       }}
       className={`group flex items-center justify-between gap-2 p-2 rounded-lg cursor-pointer transition
         ${
@@ -217,7 +265,6 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
     <div
       className={`w-full h-full overflow-hidden flex bg-gray-900 text-white border border-gray-700 ${className}`}
     >
-      {/* Switch from grid to flex so we can animate width of the editor panel */}
       <div className="flex w-full h-full">
         {/* Sidebar (Folder and Note List) */}
         <aside className="h-full w-[250px] overflow-y-auto scrollbar-hide pr-3 border-r border-gray-700 bg-gray-800">
@@ -312,9 +359,9 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
         </aside>
 
         {/* Right side: handle + animated editor panel */}
-        <div 
+        <div
           className="h-full flex"
-          style={{width: isEditorOpen ? "auto" : "1rem"}}
+          style={{ width: isEditorOpen ? "auto" : "1rem" }}
         >
           {/* Vertical handle */}
           <button
@@ -328,7 +375,7 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
             </span>
           </button>
 
-          {/* Editor panel that expands/collapses with bounce */}
+          {/* Editor panel */}
           <motion.main
             className="h-full flex flex-col bg-gray-900 origin-left"
             initial={false}
@@ -409,9 +456,7 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
                     {/* Title Input */}
                     <input
                       value={activeNote.title}
-                      onChange={(e) =>
-                        updateNote({ title: e.target.value })
-                      }
+                      onChange={(e) => updateNote({ title: e.target.value })}
                       placeholder="Note title goes here..."
                       className="w-full text-3xl font-bold bg-transparent border-b-2 border-gray-700 focus:outline-none 
                 focus:border-cyan-500 pb-2 mb-4 text-white"
@@ -420,9 +465,7 @@ export default function Notes({ storageKey = "myNotesApp.v1", className = "", on
                     {/* Body Textarea */}
                     <textarea
                       value={activeNote.body}
-                      onChange={(e) =>
-                        updateNote({ body: e.target.value })
-                      }
+                      onChange={(e) => updateNote({ body: e.target.value })}
                       placeholder="Start writing your note here..."
                       className="w-full flex-grow resize-none border border-gray-600 rounded-lg p-4 text-base bg-gray-800 text-white focus:outline-none 
                 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500"
