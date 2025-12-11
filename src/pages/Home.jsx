@@ -56,9 +56,9 @@ export default function Home() {
                             >
                                 Open Dashboard
                             </Link>
-                            <button className="rounded-xl border border-slate-600 bg-slate-900/70 px-5 py-2.5 text-sm font-medium text-slate-100 hover:border-cyan-400/80 hover:text-cyan-100 transition">
+                            {/* <button className="rounded-xl border border-slate-600 bg-slate-900/70 px-5 py-2.5 text-sm font-medium text-slate-100 hover:border-cyan-400/80 hover:text-cyan-100 transition">
                                 Watch Overview
-                            </button>
+                            </button> */}
                         </div>
 
                         <p className="text-xs text-slate-400">
