@@ -16,9 +16,7 @@ export default function Gestures() {
     )
 }
 
-/**
- * ==============   Styles   ================
- */
+// STYLES
 
 const box = {
     width: 40,

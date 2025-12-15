@@ -1,4 +1,3 @@
-// src/components/Notes.jsx
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { bounceTransition, springTransition } from "../hooks/motionTransitions";

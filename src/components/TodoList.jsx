@@ -1,4 +1,3 @@
-// src/components/TodoList.jsx
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from "framer-motion";
 import TodoForm from './TodoForm';

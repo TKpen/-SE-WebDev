@@ -12,6 +12,7 @@ import ToDoList from "./TodoList";
 import Calendar from "./Calendar";
 import { bounceTransition, springTransition } from "../hooks/motionTransitions.js";
 
+// Layout mapping
 const defaultLayout = [
     {i: "gradeCalc", x: 0, y: 0, w: 12, h: 4, minH: 4, minW: 12, maxH:20, maxW:12},
     {i: "notes", x: 4, y: 0, w: 8, h: 8, minH: 8, minW: 2.75, maxH:16, maxW: 8},
@@ -20,6 +21,7 @@ const defaultLayout = [
     {i: "calendar", x: 4, y: 6, w: 6, h: 16, minH: 4, minW: 4, maxH:16, maxW: 6},
 ];
 
+// Spring animation
 const spring = {
     type: "spring",
     stiffness: 350,

@@ -1,4 +1,3 @@
-// src/components/SettingsMenu.jsx
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import useDimensions from "../hooks/useDimensions";
@@ -47,6 +46,9 @@ export default function SettingsMenu({ user, onLogout }) {
     </div>
   );
 }
+
+
+// STYLES
 
 const sidebarVariants = {
   open: (height = 1000) => ({

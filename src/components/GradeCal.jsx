@@ -1,4 +1,3 @@
-// src/components/GradeCal.jsx
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { bounceTransition, springTransition } from "../hooks/motionTransitions";
@@ -311,7 +310,7 @@ export default function GradeCal({ onDetailsOpenChange }) {
     }
   }, [activeCourse, newRowCategory]);
 
-  // ---------- render ---------------------------------------------------
+  // ----------  final render ---------------------------------------------------
 
   return (
     <div className="p-4 text-sm text-gray-200 w-full h-full flex flex-col">
